@@ -18,7 +18,7 @@ def create_app(test_config=None):
     if db_url is None:
         # default to a sqlite database in the instance folder
         # db_url = "sqlite:///" + os.path.join(app.instance_path, "jester.sqlite")
-        db_url = "sqlite:////home/deepy/projects/jester/jester.sqlite"
+        db_url = "sqlite:////home/alex/projects/jester/jester.sqlite"
 
     app.config.from_mapping(
         SQLALCHEMY_DATABASE_URI=db_url,

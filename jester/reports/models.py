@@ -18,9 +18,15 @@ class Result(enum.Enum):
 
 class Source(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    suites = db.relationship('Testsuite', backref='source', lazy=True)
+    data = db.relationship('Metadata', backref='source', lazy=True)
+
+
+class Metadata(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    source = db.relationship('Source', backref='source', lazy=True)
     name = db.Column(db.String)
     value = db.Column(db.Integer)
-    suites = db.relationship('Testsuite', backref='source', lazy=True)
 
 
 class Testsuite(db.Model):

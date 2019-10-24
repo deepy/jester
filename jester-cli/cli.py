@@ -45,9 +45,13 @@ def launch():
         print(result)
     if sys.argv[1] == 'post':
         import requests
-        result['source'] = {'name': 'jenkins', 'value': 4}
+        result['source'] = [kv('Gradle Task', 'systemAcceptanceTest')]
         r = requests.post('http://localhost:5000/post', json=result)
         print(r.text)
+
+
+def kv(key, value):
+    return {'name': key, 'value': value}
 
 
 if __name__ == '__main__':

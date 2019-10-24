@@ -5,9 +5,10 @@ from flask import render_template
 from flask import request
 from flask import session
 from flask import url_for
+from sqlalchemy import or_, and_
 
 from jester import db
-from jester.reports.models import User, Testsuite, Testcase, Source
+from jester.reports.models import User, Testsuite, Testcase, Source, Metadata
 
 bp = Blueprint("reports", __name__)
 
@@ -40,6 +41,9 @@ def from_json(json):
         testcases.append(Testcase(**testcase))
     suite.testcases = testcases
     if json.get('source'):
+        metadata = Metadata.query.filter(
+            or_(
+                [and_(Metadata.name == x['name'], Metadata.value == x['value']) for x in json.get('source')]))
         source = Source.query.filter(Source.name == json['source']['name']).first()
         if not source:
             source = Source(name=json['source']['name'], value=json['source']['value'])
@@ -60,11 +64,12 @@ def report(name):
     # if not source:
     #     return []
     result = Source.query.with_entities(Source.id, Testcase.name, Testcase.classname, Testcase.result) \
-        .join(Testsuite.source)\
+        .join(Testsuite.source) \
         .join(Testcase, Testsuite.testcases).filter(Source.name == name)
     print(result)
     print(result.all())
     return ''
+
 
 @bp.route("/register", methods=("GET", "POST"))
 def register():
@@ -82,7 +87,7 @@ def register():
         elif not password:
             error = "Password is required."
         elif db.session.query(
-            User.query.filter_by(username=username).exists()
+                User.query.filter_by(username=username).exists()
         ).scalar():
             error = f"User {username} is already registered."
 
@@ -127,4 +132,3 @@ def logout():
     """Clear the current session, including the stored user id."""
     session.clear()
     return redirect(url_for("index"))
-
